@@ -18,7 +18,8 @@ var (
 )
 
 func usage() {
-	fmt.Println("curl_unix [-X=METHOD -d='DATA'] <URL>")
+	flag.Usage()
+	fmt.Println("\n→ ./curl-unix-socket [options] <URL: unix:///path/file.sock:/path>")
 }
 
 func setupFlags() {
@@ -41,11 +42,11 @@ func checkURL() (*url.URL, error) {
 }
 
 func main() {
+	setupFlags()
 	if len(os.Args) == 1 {
 		usage()
 		os.Exit(1)
 	}
-	setupFlags()
 	u, err := checkURL()
 	if err != nil {
 		fmt.Println(err)
