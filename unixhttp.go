@@ -65,7 +65,7 @@ func main() {
 		}
 	}
 
-	req, err := http.NewRequest(method, "http://localhost:4243"+u.Path, reader)
+	req, err := http.NewRequest(method, u.Path, reader)
 	if err != nil {
 		fmt.Println("Fail to create http request", err)
 		os.Exit(1)
@@ -81,7 +81,7 @@ func main() {
 		os.Exit(1)
 	}
 	client := httputil.NewClientConn(conn, nil)
-	res, err := requestExecute(client, req)
+	res, err := requestExecute(conn, client, req)
 	if err != nil {
 		fmt.Println("Fail to achieve http request over unix socket", err)
 		os.Exit(1)
