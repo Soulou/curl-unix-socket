@@ -16,6 +16,5 @@ func requestExecute(conn net.Conn, client *httputil.ClientConn, req *http.Reques
 		}
 		fmt.Println("> Content-Length:", req.ContentLength)
 	}
-
 	return client.Do(req)
 }

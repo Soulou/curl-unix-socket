@@ -65,7 +65,11 @@ func main() {
 		}
 	}
 
-	req, err := http.NewRequest(method, u.Path, reader)
+	query := ""
+	if len(u.RawQuery) > 0 {
+		query = "?" + u.RawQuery
+	}
+	req, err := http.NewRequest(method, u.Path+query, reader)
 	if err != nil {
 		fmt.Println("Fail to create http request", err)
 		os.Exit(1)
