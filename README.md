@@ -17,4 +17,6 @@ Curl doesn't work on UNIX socket, so I've developped that:
 * `-d`: Request data
 * `-H`: Additional Headers
   * Example: `-H 'Accept: application/json|Content-type: application/json'`
+* `-b`: Add Cookie
+  * Example: `-b 'Key=Value|Key2=Value2'`
 * `-v`: Verbose
