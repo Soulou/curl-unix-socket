@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	method, data, Header string
+	method, data, Cookie, Header string
 	Verbose              bool
 )
 
@@ -26,6 +26,7 @@ func setupFlags() {
 	flag.StringVar(&method, "X", "GET", "Method of the HTTP request")
 	flag.StringVar(&data, "d", "", "Body to send in the request")
 	flag.StringVar(&Header, "H", "", "Additional headers: k1:v1|k2:v2|...")
+	flag.StringVar(&Cookie, "b", "", "Add cookies: k1=v1|k2=v2|...") // b because thats what curl is
 	flag.BoolVar(&Verbose, "v", false, "Verbose information")
 	flag.Parse()
 }
@@ -76,6 +77,10 @@ func main() {
 	}
 	if err := addHeaders(req); err != nil {
 		fmt.Println("Fail to add headers:", err)
+		os.Exit(1)
+	}
+	if err := addCookies(req); err != nil {
+		fmt.Println("Fail to add cookies:", err)
 		os.Exit(1)
 	}
 
