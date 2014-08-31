@@ -14,7 +14,7 @@ import (
 
 var (
 	method, data, Cookie, Header string
-	Verbose              bool
+	Verbose                      bool
 )
 
 func usage() {
@@ -94,6 +94,14 @@ func main() {
 	if err != nil {
 		fmt.Println("Fail to achieve http request over unix socket", err)
 		os.Exit(1)
+	}
+
+	if Verbose {
+		fmt.Println(">")
+		fmt.Printf("< %v %v\n", res.Proto, res.Status)
+		for name, value := range res.Header {
+			fmt.Printf("< %v: %v\n", name, strings.Join(value, " "))
+		}
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
