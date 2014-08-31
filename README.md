@@ -7,6 +7,10 @@ Curl doesn't work on UNIX socket, so I've developped that:
 
 `go get github.com/Soulou/curl-unix-socket`
 
+### Archlinux
+
+You can install `curl-unix-socket-git` from AUR, thank you @slopjong
+
 ## RUN
 
 `./curl-unix-socket unix:///var/run/docker.sock:/v1.6/images/json`
