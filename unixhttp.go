@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -55,6 +55,11 @@ func main() {
 	}
 
 	hostAndPath := strings.Split(u.Path, ":")
+	if len(hostAndPath) < 2 {
+		usage()
+		os.Exit(1)
+	}
+
 	u.Host = hostAndPath[0]
 	u.Path = hostAndPath[1]
 
@@ -95,6 +100,7 @@ func main() {
 		fmt.Println("Fail to achieve http request over unix socket", err)
 		os.Exit(1)
 	}
+	defer res.Body.Close()
 
 	if Verbose {
 		fmt.Println(">")
@@ -104,13 +110,11 @@ func main() {
 		}
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Invalid body in answer")
+	_, err = io.Copy(os.Stdout, res.Body)
+	if err != nil && err != io.EOF {
+		fmt.Println("Invalid body in answer", err)
 		os.Exit(1)
 	}
 
-	fmt.Println(string(body))
-	defer res.Body.Close()
-
+	fmt.Println()
 }
