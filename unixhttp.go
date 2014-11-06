@@ -54,7 +54,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	hostAndPath := strings.Split(u.Path, ":")
+	hostAndPath := strings.SplitN(u.Path, ":", 2)
 	if len(hostAndPath) < 2 {
 		usage()
 		os.Exit(1)
