@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -68,6 +69,24 @@ func main() {
 		// If there are data the request can't be GET (curl behavior)
 		if method == "GET" {
 			method = "POST"
+		}
+		// If data begins with @, it references a file
+		if (string(data[0]) == "@") {
+			if (string(data[1:]) == "-") {
+				buf, err := ioutil.ReadAll(os.Stdin)
+				if (err != nil) {
+					fmt.Println("Failed to read from stdin:", err)
+					os.Exit(1)
+				}
+				reader = strings.NewReader(string(buf))
+			} else {
+				buf, err := ioutil.ReadFile(string(data[1:]))
+				if (err != nil) {
+					fmt.Println("Failed to open file:", err)
+					os.Exit(1)
+				}
+				reader = strings.NewReader(string(buf))
+			}
 		}
 	}
 
