@@ -71,7 +71,7 @@ func main() {
 			method = "POST"
 		}
 		// If data begins with @, it references a file
-		if (string(data[0]) == "@") {
+		if (string(data[0]) == "@" && len(data) > 1) {
 			if (string(data[1:]) == "-") {
 				buf, err := ioutil.ReadAll(os.Stdin)
 				if (err != nil) {
