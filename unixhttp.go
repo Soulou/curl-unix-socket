@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"io"
@@ -14,8 +15,8 @@ import (
 )
 
 var (
-	method, data, Cookie, Header string
-	Verbose                      bool
+	method, data, Cookie, Header  string
+	Verbose, Https, UnsecureHttps bool
 )
 
 func usage() {
@@ -29,6 +30,8 @@ func setupFlags() {
 	flag.StringVar(&Header, "H", "", "Additional headers: k1:v1|k2:v2|...")
 	flag.StringVar(&Cookie, "b", "", "Add cookies: k1=v1|k2=v2|...") // b because thats what curl is
 	flag.BoolVar(&Verbose, "v", false, "Verbose information")
+	flag.BoolVar(&Https, "https", false, "Make an HTTPS request")
+	flag.BoolVar(&UnsecureHttps, "k", false, "Accept any certificate")
 	flag.Parse()
 }
 
@@ -71,17 +74,17 @@ func main() {
 			method = "POST"
 		}
 		// If data begins with @, it references a file
-		if (string(data[0]) == "@" && len(data) > 1) {
-			if (string(data[1:]) == "-") {
+		if string(data[0]) == "@" && len(data) > 1 {
+			if string(data[1:]) == "-" {
 				buf, err := ioutil.ReadAll(os.Stdin)
-				if (err != nil) {
+				if err != nil {
 					fmt.Println("Failed to read from stdin:", err)
 					os.Exit(1)
 				}
 				reader = strings.NewReader(string(buf))
 			} else {
 				buf, err := ioutil.ReadFile(string(data[1:]))
-				if (err != nil) {
+				if err != nil {
 					fmt.Println("Failed to open file:", err)
 					os.Exit(1)
 				}
@@ -108,11 +111,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	conn, err := net.Dial("unix", u.Host)
+	var conn net.Conn
+	if Https {
+		config := &tls.Config{}
+		if UnsecureHttps {
+			config.InsecureSkipVerify = true
+		}
+		conn, err = tls.Dial("unix", u.Host, config)
+	} else {
+		conn, err = net.Dial("unix", u.Host)
+	}
+
 	if err != nil {
 		fmt.Println("Fail to connect to", u.Host, ":", err)
 		os.Exit(1)
 	}
+
 	client := httputil.NewClientConn(conn, nil)
 	res, err := requestExecute(conn, client, req)
 	if err != nil {
